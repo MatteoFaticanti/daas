@@ -99,10 +99,21 @@ def free_expired():
 
 free_drones = {1,2,3,4,5}
 
-def check_free():
-    s = set()
-    for i in l:
-        s = free_drones - {1,2}
-    return s
+def check_free(state):
+    s = free_drones.copy()
+    for i in state:
+        s = s - i[0]
+    if not s:
+        return true
+    return false
 
-print(check_free())
+def clear_drones(state):
+    s = set(state.copy())
+    # for every set of drones in the state check if the mission is finished
+    for i in state:
+        # check if difference between current time and timestep is greater 
+        # then the calculated completion time for that mission (5 is a placeholder)
+        if time.time() - i[1].time >= 5:
+            # if mission completed remove the couple drones,mission from state
+            s.remove(i)
+    return frozenset(s)

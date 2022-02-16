@@ -2,6 +2,7 @@ from sympy import false, true
 import env_classes
 import geopy.distance
 import itertools
+import time
 
 
 depot_location = [30,37]
@@ -21,7 +22,10 @@ missions = [m1, m2, m3]
 def step(state, action, mission):
     #check if the choosen drones are valid, if not remain into current state and get 0 reward
     if not check_drones(state, set(action_space[action])):
-        return frozenset(state), 0
+        return frozenset(state), -0.5
+    # when the action is the empty set, the drones that completed the mission will be freed
+    if not action:
+        return clear_drones(state), 0
     #resulting state performing a valid action
     state.add((frozenset(action_space[action]),mission))
     disposed = frozenset(state)
@@ -50,6 +54,17 @@ def extimated_completion():
     s = get_distance(depot_location)
     v = 35
     return s/v
+
+def clear_drones(state):
+    s = set(state.copy())
+    # for every set of drones in the state check if the mission is finished
+    for i in state:
+        # check if difference between current time and timestep is greater 
+        # then the calculated completion time for that mission (5 is a placeholder)
+        if time.time() - i[1].time >= 5:
+            # if mission completed remove the couple drones,mission from state
+            s.remove(i)
+    return frozenset(s)
 
 action_space = sum(
         (

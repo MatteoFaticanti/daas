@@ -2,7 +2,6 @@ from collections import defaultdict
 import numpy as np
 from sympy import false, true
 import environment as env
-import time
 
 def selection():
     # Nested dictionary that maps state ->(action -> action-value)
@@ -10,8 +9,8 @@ def selection():
     s_0 = env.reset()
     while True:
         mission = np.random.choice(env.missions)
-        if check_free(s_0):
-            s_0 = free_drones(s_0)
+        #if env.check_free(s_0):
+            #s_0 = env.clear_drones(s_0)
         new_state,drones = choose_drones(mission, Q, s_0)
         s_0 = new_state
 
@@ -37,24 +36,5 @@ def egreedy_policy(Q: defaultdict, state: frozenset, epsilon: float):
         if np.random.rand() < epsilon
         else np.argmax(Q[state])
     )
-
-def check_free(state):
-    s = env.free_drones.copy()
-    for i in state:
-        s = s - i[0]
-    if not s:
-        return true
-    return false
-
-def free_drones(state):
-    s = set(state.copy())
-    # for every set of drones in the state check if the mission is finished
-    for i in state:
-        # check if difference between current time and timestep is greater 
-        # then the calculated completion time for that mission (5 is a placeholder)
-        if time.time() - i[1].time >= 5:
-            # if mission completed remove the couple drones,mission from state
-            s.remove(i)
-    return frozenset(s)
 
 print(selection())
